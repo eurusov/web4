@@ -1,6 +1,6 @@
 package model;
 
-import org.hibernate.Session;
+import util.DBDate;
 
 import javax.persistence.*;
 
@@ -19,13 +19,17 @@ public class DailyReport {
     @Column(name = "soldCars")
     private Long soldCars;
 
-    public DailyReport() {
+    @Embedded
+    @AttributeOverride(name = "date", column = @Column)
+    private DBDate date;
 
+    public DailyReport() {
     }
 
     public DailyReport(Long earnings, Long soldCars) {
         this.earnings = earnings;
         this.soldCars = soldCars;
+        this.date = new DBDate();
     }
 
     public Long getId() {
@@ -50,5 +54,19 @@ public class DailyReport {
 
     public void setSoldCars(Long soldCars) {
         this.soldCars = soldCars;
+    }
+
+    public DBDate getDate() {
+        return date;
+    }
+
+    @Override
+    public String toString() {
+        return "DailyReport{" +
+                "id=" + id +
+                ", earnings=" + earnings +
+                ", soldCars=" + soldCars +
+                ", date=" + date +
+                '}';
     }
 }
