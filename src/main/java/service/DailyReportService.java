@@ -6,7 +6,6 @@ import model.SimpleReport;
 import org.hibernate.SessionFactory;
 import util.DBHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

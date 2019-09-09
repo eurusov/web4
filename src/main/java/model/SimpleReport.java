@@ -12,23 +12,23 @@ public class SimpleReport {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
+    private Long id;
 
     @Column
-    protected Long earnings;
+    private Long earnings;
 
     @Column
-    protected Long soldCars;
+    private Long soldCars;
 
     public SimpleReport() {
     }
 
-    public SimpleReport(Long earnings, Long soldCars) {
+    public SimpleReport(final Long earnings, final Long soldCars) {
         this.earnings = earnings;
         this.soldCars = soldCars;
     }
 
-    public SimpleReport(SimpleReport report) {
+    public SimpleReport(final SimpleReport report) {
         id = report.id;
         earnings = report.earnings;
         soldCars = report.soldCars;
@@ -38,7 +38,7 @@ public class SimpleReport {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -46,7 +46,7 @@ public class SimpleReport {
         return earnings;
     }
 
-    public void setEarnings(Long earnings) {
+    public void setEarnings(final Long earnings) {
         this.earnings = earnings;
     }
 
@@ -54,7 +54,7 @@ public class SimpleReport {
         return soldCars;
     }
 
-    public void setSoldCars(Long soldCars) {
+    public void setSoldCars(final Long soldCars) {
         this.soldCars = soldCars;
     }
 

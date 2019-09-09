@@ -15,7 +15,7 @@ public class DailyReport extends SimpleReport {
         super();
     }
 
-    public DailyReport(Long earnings, Long soldCars) {
+    public DailyReport(final Long earnings, final Long soldCars) {
         super(earnings, soldCars);
         this.date = new DBDate();
     }
@@ -27,9 +27,9 @@ public class DailyReport extends SimpleReport {
     @Override
     public String toString() {
         return "DailyReport{" +
-                "id=" + id +
-                ", earnings=" + earnings +
-                ", soldCars=" + soldCars +
+                "id=" + super.getId() +
+                ", earnings=" + super.getEarnings() +
+                ", soldCars=" + super.getSoldCars() +
                 ", date=" + date +
                 '}';
     }
