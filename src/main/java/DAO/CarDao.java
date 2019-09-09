@@ -19,12 +19,22 @@ public class CarDao {
         return (Car) session.get(Car.class, id);
     }
 
+    public void setSold(long id) throws HibernateException {
+        Transaction transaction = session.beginTransaction();
+        Car car = (Car) session.get(Car.class, id);
+        car.setSold();
+        session.update(car);
+        transaction.commit();
+        session.close();
+    }
+
     public long insertCar(String brand, String model, String licensePlate, Long price) throws HibernateException {
         return (Long) session.save(new Car(brand, model, licensePlate, price));
     }
+
     public List<Car> getAllCar() {
         Transaction transaction = session.beginTransaction();
-        List<Car> Cars = session.createQuery("FROM Car").list();
+        List Cars = session.createQuery("FROM Car").list();
         transaction.commit();
         session.close();
         return Cars;

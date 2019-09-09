@@ -4,84 +4,32 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "cars")
-public class Car {
+public class Car extends SimpleCar {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Override
-    public String toString() {
-        return "Car{" +
-                "id=" + id +
-                ", brand='" + brand + '\'' +
-                ", model='" + model + '\'' +
-                ", licensePlate='" + licensePlate + '\'' +
-                ", price=" + price +
-                '}';
-    }
-
-    @Column(name = "brand")
-    private String brand;
-
-    @Column(name = "model")
-    private String model;
-
-    @Column(name = "licensePlate")
-    private String licensePlate;
-
-    @Column(name = "price")
-    private Long price;
+    @Column
+    private boolean sold;
 
     public Car() {
-
+        super();
     }
 
     public Car(String brand, String model, String licensePlate, Long price) {
-        this.brand = brand;
-        this.model = model;
-        this.licensePlate = licensePlate;
-        this.price = price;
+        super(brand, model, licensePlate, price);
+        sold = false;
     }
 
-    public String getBrand() {
-        return brand;
+    public boolean isSold() {
+        return sold;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public void setSold() {
+        this.sold = true;
     }
 
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public String getLicensePlate() {
-        return licensePlate;
-    }
-
-    public void setLicensePlate(String licensePlate) {
-        this.licensePlate = licensePlate;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getPrice() {
-        return price;
-    }
-
-    public void setPrice(Long price) {
-        this.price = price;
+    @Override
+    public String toString() {
+        return super.toString() + " Car{" +
+                "sold=" + sold +
+                "}";
     }
 }

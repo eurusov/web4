@@ -31,6 +31,10 @@ public class Main {
                     45000L);
             System.out.println("Added car id: " + carId);
 
+            CarService carSrv = CarService.getInstance();
+
+            carSrv.setSoldCar(carId);
+
             carId = dbService.addCar(
                     "Toyota",
                     "Supra",
@@ -51,7 +55,6 @@ public class Main {
             System.out.println("Report data set: " + report);
             System.out.println();
 
-            CarService carSrv = CarService.getInstance();
             System.out.println(carSrv.getAllCars());
 
             DailyReportService drSrv = DailyReportService.getInstance();

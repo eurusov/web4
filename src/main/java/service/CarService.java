@@ -1,11 +1,12 @@
 package service;
 
 import DAO.CarDao;
-import model.Car;
+import model.SimpleCar;
 import org.hibernate.SessionFactory;
 import util.DBHelper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CarService {
 
@@ -24,7 +25,20 @@ public class CarService {
         return carService;
     }
 
-    public List<Car> getAllCars() {
-        return new CarDao(sessionFactory.openSession()).getAllCar();
+//    public List<Car> getAllCars() {
+//        return new CarDao(sessionFactory.openSession()).getAllCar();
+//    }
+
+    public List<SimpleCar> getAllCars() {
+        return new CarDao(sessionFactory.openSession()).getAllCar()
+                .stream()
+                .filter(e -> !e.isSold())
+                .map(SimpleCar::new)
+                .collect(Collectors.toList());
+    }
+
+    public void setSoldCar(Long id) {
+        CarDao dao = new CarDao(sessionFactory.openSession());
+        dao.setSold(id);
     }
 }

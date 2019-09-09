@@ -29,6 +29,7 @@ public class DBHelper {
 
     private static Configuration getMySqlConfiguration() {
         Configuration configuration = new Configuration();
+
         configuration.addAnnotatedClass(Car.class);
         configuration.addAnnotatedClass(DailyReport.class);
 
