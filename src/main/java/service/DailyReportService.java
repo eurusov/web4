@@ -2,10 +2,13 @@ package service;
 
 import DAO.DailyReportDao;
 import model.DailyReport;
+import model.SimpleReport;
 import org.hibernate.SessionFactory;
 import util.DBHelper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DailyReportService {
 
@@ -24,12 +27,15 @@ public class DailyReportService {
         return dailyReportService;
     }
 
-    public List<DailyReport> getAllDailyReports() {
-        return new DailyReportDao(sessionFactory.openSession()).getAllDailyReport();
+    public List<SimpleReport> getAllDailyReports() {
+        return new DailyReportDao(sessionFactory.openSession()).getAllDailyReport()
+                .stream()
+                .map(SimpleReport::new)
+                .collect(Collectors.toList());
     }
 
-
-    public DailyReport getLastReport() {
-        return new DailyReportDao(sessionFactory.openSession()).getLastDailyReport();
+    public SimpleReport getLastReport() {
+        DailyReport dailyReport = new DailyReportDao(sessionFactory.openSession()).getLastDailyReport();
+        return new SimpleReport(dailyReport);
     }
 }

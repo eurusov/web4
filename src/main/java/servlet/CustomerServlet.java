@@ -1,6 +1,5 @@
 package servlet;
 
-import com.google.gson.Gson;
 import service.CarService;
 
 import javax.servlet.ServletException;
@@ -12,15 +11,7 @@ import java.io.IOException;
 public class CustomerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Gson gson = new Gson();
-        String json = gson.toJson(CarService.getInstance().getAllCars());
-
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().println(json);
-        resp.flushBuffer();
+        ServletHelper.writeJsonToResponse(CarService.getInstance().getAllCars(), resp);
     }
 
     @Override

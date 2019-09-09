@@ -14,10 +14,17 @@ public class DailyReportDao {
         this.session = session;
     }
 
+    public DailyReport get(long id) {
+        return (DailyReport) session.get(DailyReport.class, id);
+    }
+
+    public long insertDailyReport(Long earnings, Long soldCars) {
+        return (Long) session.save(new DailyReport(earnings, soldCars));
+    }
+
     public List<DailyReport> getAllDailyReport() {
         Transaction transaction = session.beginTransaction();
-        List<DailyReport> dailyReports = session.createQuery("FROM DailyReport").list();
-//        List<DailyReport> dailyReports = session.createQuery("select d.earnings FROM DailyReport d").list();
+        List dailyReports = session.createQuery("FROM DailyReport").list();
         transaction.commit();
         session.close();
         return dailyReports;
@@ -25,18 +32,9 @@ public class DailyReportDao {
 
     public DailyReport getLastDailyReport() {
         Transaction transaction = session.beginTransaction();
-        List<DailyReport> dailyReports = session.createQuery("FROM DailyReport r WHERE r.date in (select max(r.date) FROM r)").list();
-//        List<DailyReport> dailyReports = session.createQuery("select max(date) FROM DailyReport").list();
+        List dailyReports = session.createQuery("FROM DailyReport r WHERE r.date in (select max(r.date) FROM r)").list();
         transaction.commit();
         session.close();
-        return dailyReports.get(0);
-    }
-
-    public DailyReport get(long id) {
-        return (DailyReport) session.get(DailyReport.class, id);
-    }
-
-    public long insertDailyReport(Long earnings, Long soldCars) {
-        return (Long) session.save(new DailyReport(earnings, soldCars));
+        return (DailyReport) dailyReports.get(0);
     }
 }
