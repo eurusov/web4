@@ -4,6 +4,7 @@ import DAO.DailyReportDao;
 import model.DailyReport;
 import model.SimpleReport;
 import org.hibernate.SessionFactory;
+import util.DBException;
 import util.DBHelper;
 
 import java.util.List;
@@ -33,8 +34,18 @@ public class DailyReportService {
                 .collect(Collectors.toList());
     }
 
+    public SimpleReport getDailyReport(long id) throws DBException {
+        DailyReport dailyReport = new DailyReportDao(sessionFactory.openSession()).getDailyReport(id);
+        return new SimpleReport(dailyReport);
+    }
+
     public SimpleReport getLastReport() {
         DailyReport dailyReport = new DailyReportDao(sessionFactory.openSession()).getLastDailyReport();
         return new SimpleReport(dailyReport);
+    }
+
+    public Long addDailyReport(Long earnings, Long soldCars) {
+        return new DailyReportDao(sessionFactory.openSession())
+                .addDailyReport(earnings, soldCars);
     }
 }

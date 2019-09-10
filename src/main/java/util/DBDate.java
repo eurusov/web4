@@ -7,12 +7,12 @@ import javax.persistence.Transient;
 public final class DBDate implements Comparable {
 
     @Transient
-    private static long NOW;
+    private static long currentDate;
 
     private Long date;
 
     public DBDate() {
-        this.date = NOW;
+        this.date = currentDate;
     }
 
     public DBDate(Long date) {
@@ -28,7 +28,7 @@ public final class DBDate implements Comparable {
     }
 
     public static void nextDay() {
-        NOW++;
+        currentDate++;
     }
 
     @Override

@@ -14,27 +14,47 @@ public class DailyReportDao {
         this.session = session;
     }
 
-    public DailyReport get(long id) {
-        return (DailyReport) session.get(DailyReport.class, id);
-    }
+    public DailyReport getDailyReport(long id) {
+        Transaction tx = session.beginTransaction();
 
-    public long insertDailyReport(Long earnings, Long soldCars) {
-        return (Long) session.save(new DailyReport(earnings, soldCars));
-    }
+        DailyReport dailyReport = (DailyReport) session.get(DailyReport.class, id);
 
-    public List<DailyReport> getAllDailyReport() {
-        Transaction transaction = session.beginTransaction();
-        List dailyReports = session.createQuery("FROM DailyReport").list();
-        transaction.commit();
+        tx.commit();
         session.close();
-        return dailyReports;
+        return dailyReport;
     }
 
     public DailyReport getLastDailyReport() {
-        Transaction transaction = session.beginTransaction();
-        List dailyReports = session.createQuery("FROM DailyReport r WHERE r.date in (select max(r.date) FROM r)").list();
-        transaction.commit();
+        Transaction tx = session.beginTransaction();
+
+        List dailyReports = session.createQuery(
+                "FROM DailyReport r WHERE r.date in (select max(r.date) FROM r)"
+        ).list();
+
+        tx.commit();
         session.close();
         return (DailyReport) dailyReports.get(0);
+    }
+
+    // TODO:  Переделать чтобы принимал DailyReport вместо набора значений полей.
+    public Long addDailyReport(Long earnings, Long soldCars) {
+        Transaction tx = session.beginTransaction();
+
+        Long id = (Long) session.save(new DailyReport(earnings, soldCars));
+
+        tx.commit();
+        session.close();
+        return id;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DailyReport> getAllDailyReport() {
+        Transaction tx = session.beginTransaction();
+
+        List dailyReports = session.createQuery("FROM DailyReport").list();
+
+        tx.commit();
+        session.close();
+        return dailyReports;
     }
 }

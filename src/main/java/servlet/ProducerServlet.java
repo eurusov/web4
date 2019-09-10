@@ -15,17 +15,17 @@ public class ProducerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Map<String, String[]> params = req.getParameterMap();
         CarService carService = CarService.getInstance();
-        boolean accepted = false;
+        Long acceptedId = null;
         try {
-            accepted = carService.addCar(
+            acceptedId = carService.addCar(
                     params.get("brand")[0],
                     params.get("model")[0],
                     params.get("licensePlate")[0],
                     Long.valueOf(params.get("price")[0])
             );
-        } catch (DBException ignored) {
+        } catch (Exception ignored) {
         }
-        resp.setStatus(accepted ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN);
+        resp.setStatus(acceptedId != null ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN);
         resp.getWriter().println("");
         resp.flushBuffer();
     }

@@ -18,45 +18,64 @@ public class CarDao {
         this.session = session;
     }
 
-    public Car get(long id) throws HibernateException {
-        return (Car) session.get(Car.class, id);
-    }
+    public Car getCar(long id) throws HibernateException {
+        Transaction tx = session.beginTransaction();
 
-    public void setSold(long id) throws HibernateException {
-        Transaction transaction = session.beginTransaction();
         Car car = (Car) session.get(Car.class, id);
-        car.setSold();
-        session.update(car);
-        transaction.commit();
+
+        tx.commit();
         session.close();
+        return car;
     }
 
-    public long insertCar(String brand, String model, String licensePlate, Long price) throws HibernateException {
-        return (Long) session.save(new Car(brand, model, licensePlate, price));
-    }
-
+    @SuppressWarnings("unchecked")
     public List<Car> getAllCar() {
-        Transaction transaction = session.beginTransaction();
+        Transaction tx = session.beginTransaction();
+
+        // TODO: Сделать чтобы выбирались только не проданные машины, возможно в отдельном методе, и через Criteria.
         List Cars = session.createQuery("FROM Car").list();
-        transaction.commit();
+
+        tx.commit();
         session.close();
         return Cars;
     }
 
+    public void setSold(long id) throws HibernateException {
+        Transaction tx = session.beginTransaction();
+
+        Car car = (Car) session.get(Car.class, id);
+        car.setSold();
+        session.update(car); // TODO:  Проверить, возможно update не нужен, так как car должен быть persistent.
+
+        tx.commit();
+        session.close();
+    }
+
+    // TODO:  Переделать чтобы принимал Car вместо набора значений полей.
+    public Long addCar(String brand, String model, String licensePlate, Long price) throws HibernateException {
+        Transaction tx = session.beginTransaction();
+
+        Long id = (Long) session.save(new Car(brand, model, licensePlate, price));
+
+        tx.commit();
+        session.close();
+        return id;
+    }
+
     public int ofBrandCount(String brand) {
-        Transaction transaction = session.beginTransaction();
+        // TODO:  Проверить по логам и в дебаге, где здесь реально начинаются транзакции.
         Criteria criteria = session.createCriteria(Car.class);
         criteria.add(Restrictions.eq("brand", brand));
+        criteria.add(Restrictions.eq("sold", false));
         criteria.setProjection(Projections.rowCount());
-//        List Cars = session.createQuery("select FROM Car").list();
-        transaction.commit();
-        int res;
-        if (criteria.uniqueResult() == null) {
-            res = 0;
-        } else {
-            res = ((Long) criteria.uniqueResult()).intValue();
-        }
+
+        Transaction tx = session.beginTransaction();
+
+        Object res = criteria.uniqueResult();
+
+        tx.commit();
         session.close();
-        return res;
+        return res == null ? 0 : ((Long) res).intValue();
     }
+
 }

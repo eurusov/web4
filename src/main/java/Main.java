@@ -1,9 +1,9 @@
-import model.Car;
 import model.DailyReport;
+import model.SimpleCar;
+import model.SimpleReport;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.hibernate.SessionFactory;
 import service.CarService;
 import service.DailyReportService;
 import servlet.CustomerServlet;
@@ -20,52 +20,53 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Logger.getLogger("org.hibernate").setLevel(Level.WARNING);
-        DBHelper dbService = new DBHelper();
-        SessionFactory sessionFactory = DBHelper.getSessionFactory();
+//        DBHelper.getSessionFactory();
         DBHelper.printConnectInfo();
 
-//        try {
-//            long carId = dbService.addCar(
-//                    "Honda",
-//                    "Acura TLX",
-//                    "BD51 SMR",
-//                    45000L);
-//            System.out.println("Added car id: " + carId);
-//
-//            CarService carSrv = CarService.getInstance();
-//
-//            carSrv.setSoldCar(carId);
-//
-//            carId = dbService.addCar(
-//                    "Toyota",
-//                    "Supra",
-//                    "BND007",
-//                    55000L);
-//            System.out.println("Added car id: " + carId);
-//
-//
-//            Car car = dbService.getCar(carId);
-//            System.out.println("Car data set: " + car);
-//            System.out.println();
-//
-//            dbService.addDailyReport(123000L, 16L);
-//            DBDate.nextDay();
-//            long repId = dbService.addDailyReport(3000L, 10L);
-//            System.out.println("Added report id: " + repId);
-//            DailyReport report = dbService.getDailyReport(repId);
-//            System.out.println("Report data set: " + report);
-//            System.out.println();
-//
-//            System.out.println(carSrv.getAllCars());
-//
-//            DailyReportService drSrv = DailyReportService.getInstance();
-//            System.out.println(drSrv.getAllDailyReports());
-//            System.out.println(drSrv.getLastReport());
-//
-////            sessionFactory.close();
-//        } catch (DBException e) {
-//            e.printStackTrace();
-//        }
+        CarService carService = CarService.getInstance();
+        DailyReportService dailyReportService = DailyReportService.getInstance();
+
+        Long carId = carService.addCar(
+                "Honda",
+                "Acura TLX",
+                "BD51 SMR",
+                45000L
+        );
+        System.out.println("id of added car: " + carId);
+        carService.sellCar(carId); // mark this car as sold
+        SimpleCar car = carService.getCar(carId);
+        System.out.println(car);
+
+        carId = carService.addCar(
+                "Toyota",
+                "Supra",
+                "BND007",
+                55000L
+        );
+        System.out.println("id of added car: " + carId);
+        SimpleCar car2 = carService.getCar(carId);
+        System.out.println(car2);
+        System.out.println();
+
+        System.exit(0);
+
+        dailyReportService.addDailyReport(123000L, 16L);
+        DBDate.nextDay();
+        long repId = dailyReportService.addDailyReport(3000L, 10L);
+        System.out.println("Added report id: " + repId);
+        SimpleReport report = dailyReportService.getDailyReport(repId);
+        System.out.println("Report data set: " + report);
+        System.out.println();
+
+        System.out.println(carService.getAllCars());
+
+        DailyReportService drSrv = DailyReportService.getInstance();
+        System.out.println(drSrv.getAllDailyReports());
+        System.out.println(drSrv.getLastReport());
+
+        DBHelper.deleteAll();
+
+//            sessionFactory.close();
 
         CustomerServlet customerServlet = new CustomerServlet();
         DailyReportServlet dailyReportServlet = new DailyReportServlet();

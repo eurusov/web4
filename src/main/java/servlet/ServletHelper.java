@@ -9,12 +9,10 @@ import java.io.IOException;
 public class ServletHelper {
 
     static void writeJsonToResponse(@Nullable Object src, HttpServletResponse resp) throws IOException {
-        Gson gson = new Gson();
-        String json = gson.toJson(src);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().println(json);
+        new Gson().toJson(src, resp.getWriter());
         resp.flushBuffer();
     }
 

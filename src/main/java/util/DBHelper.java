@@ -1,10 +1,7 @@
 package util;
 
-import DAO.CarDao;
-import DAO.DailyReportDao;
 import model.Car;
 import model.DailyReport;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -20,11 +17,23 @@ public class DBHelper {
 
     private static SessionFactory sessionFactory;
 
+    static {
+        sessionFactory = createSessionFactory();
+    }
+
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             sessionFactory = createSessionFactory();
         }
         return sessionFactory;
+    }
+
+    private static SessionFactory createSessionFactory() {
+        Configuration configuration = getMySqlConfiguration();
+        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        builder.applySettings(configuration.getProperties());
+        ServiceRegistry serviceRegistry = builder.build();
+        return configuration.buildSessionFactory(serviceRegistry);
     }
 
     private static Configuration getMySqlConfiguration() {
@@ -42,12 +51,13 @@ public class DBHelper {
         return configuration;
     }
 
-    private static SessionFactory createSessionFactory() {
-        Configuration configuration = getMySqlConfiguration();
-        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
-        builder.applySettings(configuration.getProperties());
-        ServiceRegistry serviceRegistry = builder.build();
-        return configuration.buildSessionFactory(serviceRegistry);
+    public static void deleteAll() {
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+        sess.createQuery("delete from Car").executeUpdate();
+        sess.createQuery("delete from DailyReport").executeUpdate();
+        tx.commit();
+        sess.close();
     }
 
     public static void printConnectInfo() {
@@ -65,57 +75,4 @@ public class DBHelper {
             e.printStackTrace();
         }
     }
-
-    public Car getCar(long id) throws DBException {
-        try {
-            Session session = sessionFactory.openSession();
-            CarDao dao = new CarDao(session);
-            Car dataSet = dao.get(id);
-            session.close();
-            return dataSet;
-        } catch (HibernateException e) {
-            throw new DBException(e);
-        }
-    }
-
-    public DailyReport getDailyReport(long id) throws DBException {
-        try {
-            Session session = sessionFactory.openSession();
-            DailyReportDao dao = new DailyReportDao(session);
-            DailyReport dataSet = dao.get(id);
-            session.close();
-            return dataSet;
-        } catch (HibernateException e) {
-            throw new DBException(e);
-        }
-    }
-
-    public long addDailyReport(Long earnings, Long soldCars) throws DBException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            DailyReportDao dao = new DailyReportDao(session);
-            long id = dao.insertDailyReport(earnings, soldCars);
-            transaction.commit();
-            session.close();
-            return id;
-        } catch (HibernateException e) {
-            throw new DBException(e);
-        }
-    }
-
-    public long addCar(String brand, String model, String licensePlate, Long price) throws DBException {
-        try {
-            Session session = sessionFactory.openSession();
-            Transaction transaction = session.beginTransaction();
-            CarDao dao = new CarDao(session);
-            long id = dao.insertCar(brand, model, licensePlate, price);
-            transaction.commit();
-            session.close();
-            return id;
-        } catch (HibernateException e) {
-            throw new DBException(e);
-        }
-    }
-
 }
