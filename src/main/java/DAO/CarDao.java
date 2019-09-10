@@ -1,9 +1,12 @@
 package DAO;
 
 import model.Car;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
 
@@ -40,4 +43,20 @@ public class CarDao {
         return Cars;
     }
 
+    public int ofBrandCount(String brand) {
+        Transaction transaction = session.beginTransaction();
+        Criteria criteria = session.createCriteria(Car.class);
+        criteria.add(Restrictions.eq("brand", brand));
+        criteria.setProjection(Projections.rowCount());
+//        List Cars = session.createQuery("select FROM Car").list();
+        transaction.commit();
+        int res;
+        if (criteria.uniqueResult() == null) {
+            res = 0;
+        } else {
+            res = ((Long) criteria.uniqueResult()).intValue();
+        }
+        session.close();
+        return res;
+    }
 }
