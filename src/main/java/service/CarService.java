@@ -3,11 +3,7 @@ package service;
 import DAO.CarDao;
 import model.Car;
 import model.SimpleCar;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import util.DBException;
 import util.DBHelper;
 
@@ -66,5 +62,18 @@ public class CarService {
 
     private int ofBrandCount(String brand) {
         return new CarDao(sessionFactory.openSession()).ofBrandCount(brand);
+    }
+
+    public Long getCarId(String brand, String model, String licensePlate) {
+        return new CarDao(sessionFactory.openSession()).getCarId(brand, model, licensePlate, false);
+    }
+
+    public boolean sellCar(String brand, String model, String licensePlate) {
+        Long id = getCarId(brand, model, licensePlate);
+        if (id == null) {
+            return false;
+        }
+        sellCar(id);
+        return true;
     }
 }

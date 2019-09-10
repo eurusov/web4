@@ -1,10 +1,7 @@
 package DAO;
 
 import model.Car;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -78,4 +75,22 @@ public class CarDao {
         return res == null ? 0 : ((Long) res).intValue();
     }
 
+    public Long getCarId(String brand, String model, String licensePlate, boolean sold) {
+        String sql = "SELECT id FROM Car WHERE brand=:c_brand AND model=:c_model AND licensePlate=:c_licensePlate AND sold=:c_sold";
+
+        Transaction tx = session.beginTransaction();
+
+        Query query = session.createQuery(sql);
+        query.setString("c_brand", brand);
+        query.setString("c_model", model);
+        query.setString("c_licensePlate", licensePlate);
+        query.setParameter("c_sold", sold);
+
+        List res = query.list();
+
+        tx.commit();
+        session.close();
+
+        return (res.size() == 0) ? null : (Long) res.get(0);
+    }
 }

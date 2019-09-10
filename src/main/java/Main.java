@@ -1,4 +1,3 @@
-import model.DailyReport;
 import model.SimpleCar;
 import model.SimpleReport;
 import org.eclipse.jetty.server.Server;
@@ -10,7 +9,6 @@ import servlet.CustomerServlet;
 import servlet.DailyReportServlet;
 import servlet.ProducerServlet;
 import util.DBDate;
-import util.DBException;
 import util.DBHelper;
 
 import java.util.logging.Level;
@@ -67,9 +65,9 @@ public class Main {
         System.out.println("\nLast report:\n" + dailyReportService.getLastReport());
         System.out.println();
 
-//        DBHelper.deleteAll();
+        DBHelper.deleteAll();
 
-//            sessionFactory.close();
+//        sessionFactory.close();
 
         CustomerServlet customerServlet = new CustomerServlet();
         DailyReportServlet dailyReportServlet = new DailyReportServlet();

@@ -43,7 +43,7 @@ public class DBHelper {
         configuration.addAnnotatedClass(DailyReport.class);
 
         configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/carshop");
+        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/carshop?serverTimezone=UTC");
         configuration.setProperty("hibernate.connection.username", "root");
         configuration.setProperty("hibernate.connection.password", "msql74_");
         configuration.setProperty("hibernate.show_sql", "false");
