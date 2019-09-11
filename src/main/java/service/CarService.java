@@ -68,6 +68,11 @@ public class CarService {
         return new CarDao(sessionFactory.openSession()).getCarId(brand, model, licensePlate, false);
     }
 
+    public int removeSoldCars(){
+        return new CarDao(sessionFactory.openSession()).removeSoldCars();
+    }
+
+
     public boolean sellCar(String brand, String model, String licensePlate) {
         Long id = getCarId(brand, model, licensePlate);
         if (id == null) {

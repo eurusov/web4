@@ -1,5 +1,6 @@
 package service;
 
+import DAO.CarDao;
 import DAO.DailyReportDao;
 import model.DailyReport;
 import model.SimpleReport;
@@ -47,5 +48,11 @@ public class DailyReportService {
     public Long addDailyReport(Long earnings, Long soldCars) {
         return new DailyReportDao(sessionFactory.openSession())
                 .addDailyReport(earnings, soldCars);
+    }
+
+    public void createDailyReport() {
+        CarDao carDao = new CarDao(sessionFactory.openSession());
+        SimpleReport sales = carDao.salesReport();
+        addDailyReport(sales.getEarnings(), sales.getSoldCars());
     }
 }

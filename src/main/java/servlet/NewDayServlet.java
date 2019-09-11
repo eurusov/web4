@@ -1,15 +1,19 @@
 package servlet;
 
-import javax.servlet.ServletException;
+import service.CarService;
+import service.DailyReportService;
+import util.DBDate;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class NewDayServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        DailyReportService.getInstance().createDailyReport();
+        CarService.getInstance().removeSoldCars();
+        DBDate.nextDay();
     }
 }

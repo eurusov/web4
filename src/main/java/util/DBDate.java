@@ -27,6 +27,10 @@ public final class DBDate implements Comparable {
         this.date = date;
     }
 
+    public static DBDate yesterday() {
+        return new DBDate(currentDate - 1L);
+    }
+
     public static void nextDay() {
         currentDate++;
     }
