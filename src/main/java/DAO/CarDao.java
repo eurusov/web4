@@ -3,7 +3,6 @@ package DAO;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import model.Car;
-import model.SimpleReport;
 import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -18,48 +17,32 @@ public class CarDao {
         this.session = session;
     }
 
-    public Car getCar(long id) throws HibernateException {
-        Transaction tx = session.beginTransaction();
-
-        Car car = (Car) session.get(Car.class, id);
-
-        tx.commit();
-        session.close();
-        return car;
+    /**
+     * Return the persistent instance of the Car class with the given id, or null if there is no such persistent instance.
+     *
+     * @param id Car id
+     * @return a persistent instance or null
+     */
+    public @Nullable
+    Car getCar(long id) {
+        return (Car) session.get(Car.class, id);
     }
 
     @SuppressWarnings("unchecked")
     public List<Car> getAllCar() {
-        Transaction tx = session.beginTransaction();
-
-        // TODO: Сделать чтобы выбирались только не проданные машины, возможно в отдельном методе, и через Criteria.
-        List Cars = session.createQuery("FROM Car").list();
-
-        tx.commit();
-        session.close();
-        return Cars;
-    }
-
-    public void setSold(long id) throws HibernateException {
-        Transaction tx = session.beginTransaction();
-
-        Car car = (Car) session.get(Car.class, id);
-        car.setSold();
-        session.update(car); // TODO:  Проверить, возможно update не нужен, так как car должен быть persistent.
-
-        tx.commit();
-        session.close();
+        // TODO: Сделать параметризацию sold.
+        return session.createQuery("FROM Car WHERE sold=false").list();
     }
 
     // TODO:  Переделать чтобы принимал Car вместо набора значений полей.
     public Long addCar(String brand, String model, String licensePlate, Long price) throws HibernateException {
-        Transaction tx = session.beginTransaction();
+        return (Long) session.save(new Car(brand, model, licensePlate, price));
+    }
 
-        Long id = (Long) session.save(new Car(brand, model, licensePlate, price));
-
-        tx.commit();
-        session.close();
-        return id;
+    public void setSold(long id) throws HibernateException {
+        Car car = (Car) session.get(Car.class, id);
+        car.setSold();
+        session.update(car); // TODO:  Проверить, возможно update не нужен, так как car должен быть persistent.
     }
 
     /**
@@ -92,9 +75,6 @@ public class CarDao {
                 + " AND model=:c_model"
                 + " AND licensePlate=:c_licensePlate"
                 + " AND sold=:c_sold";
-
-        Transaction tx = session.beginTransaction();
-
         Query query = session.createQuery(sql);
         query.setString("c_brand", brand);
         query.setString("c_model", model);
@@ -104,28 +84,18 @@ public class CarDao {
         // TODO: посмотреть что возвращает в случае если ничего не найдено: null или пустой список
         List res = query.list();
 
-        tx.commit();
-        session.close();
-
         return (res.size() == 0) ? null : (Long) res.get(0);
     }
 
     /**
      * @return Number of cars sold.
      */
-    @NotNull
-    public Long soldCount() {
-        String countHql = "SELECT COUNT(*) FROM Car WHERE sold=true";
-        Transaction tx = session.beginTransaction();
-
-        Query countQuery = session.createQuery(countHql);
-        Long count = (Long) countQuery.uniqueResult();
-
-        tx.commit();
-        session.close();
-
-        return (count == null) ? 0L : count;
-    }
+//    @Nullable
+//    public Long soldCount() {
+//        String countHql = "SELECT COUNT(*) FROM Car WHERE sold=true";
+//        return (Long) session.createQuery(countHql).uniqueResult();
+//    }
+//
 
     /**
      * @return Total sales of cars.
@@ -133,33 +103,7 @@ public class CarDao {
     @NotNull
     public Long soldAmount() {
         String sumHql = "SELECT SUM(price) FROM Car WHERE sold=true";
-
-        Transaction tx = session.beginTransaction();
-
-        Query sumQuery = session.createQuery(sumHql);
-        Long sum = (Long) sumQuery.uniqueResult();
-
-        tx.commit();
-        session.close();
-
-        return (sum == null) ? 0L : sum;
-    }
-
-    public SimpleReport salesReport() {
-        String sumHql = "SELECT SUM(price) FROM Car WHERE sold=true";
-        String countHql = "SELECT COUNT(*) FROM Car WHERE sold=true";
-
-        Transaction tx = session.beginTransaction();
-
-        Query sumQuery = session.createQuery(sumHql);
-        Long sum = (Long) sumQuery.uniqueResult();
-        Query countQuery = session.createQuery(countHql);
-        Long count = (Long) countQuery.uniqueResult();
-
-        tx.commit();
-        session.close();
-
-        return new SimpleReport(sum, count);
+        return (Long) session.createQuery(sumHql).uniqueResult();
     }
 
     /**
@@ -168,14 +112,7 @@ public class CarDao {
      * @return The number of deleted entities.
      */
     public int removeSoldCars() {
-        final String sumHql = "DELETE FROM Car WHERE sold=true";
-
-        Transaction tx = session.beginTransaction();
-
-        int deletedRows = session.createQuery(sumHql).executeUpdate();
-
-        tx.commit();
-        session.close();
-        return deletedRows;
+        String sumHql = "DELETE FROM Car WHERE sold=true";
+        return session.createQuery(sumHql).executeUpdate();
     }
 }

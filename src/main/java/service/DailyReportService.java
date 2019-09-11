@@ -4,7 +4,9 @@ import DAO.CarDao;
 import DAO.DailyReportDao;
 import model.DailyReport;
 import model.SimpleReport;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import util.DBException;
 import util.DBHelper;
 
@@ -51,8 +53,18 @@ public class DailyReportService {
     }
 
     public void createDailyReport() {
-        CarDao carDao = new CarDao(sessionFactory.openSession());
-        SimpleReport sales = carDao.salesReport();
-        addDailyReport(sales.getEarnings(), sales.getSoldCars());
+        Session sess = sessionFactory.openSession();
+        CarDao carDao = new CarDao(sess);
+        Transaction tx = sess.beginTransaction();
+
+        Long soldAmount = carDao.soldAmount();
+//        Long soldCount = carDao.soldCount();
+        long soldCount = new CarDao(sess).removeSoldCars();
+
+        tx.commit();
+        sess.close();
+
+        soldAmount = soldAmount == null ? 0 : soldAmount;
+        addDailyReport(soldAmount, soldCount);
     }
 }

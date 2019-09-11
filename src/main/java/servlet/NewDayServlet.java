@@ -1,6 +1,5 @@
 package servlet;
 
-import service.CarService;
 import service.DailyReportService;
 import util.DBDate;
 
@@ -13,7 +12,7 @@ public class NewDayServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         DailyReportService.getInstance().createDailyReport();
-        CarService.getInstance().removeSoldCars();
+//        CarService.getInstance().removeSoldCars();
         DBDate.nextDay();
     }
 }

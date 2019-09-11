@@ -3,8 +3,9 @@ package service;
 import DAO.CarDao;
 import model.Car;
 import model.SimpleCar;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import util.DBException;
+import org.hibernate.Transaction;
 import util.DBHelper;
 
 import java.util.List;
@@ -27,33 +28,67 @@ public class CarService {
         return carService;
     }
 
-//    public List<Car> getAllCars() {
-//        return new CarDao(sessionFactory.openSession()).getAllCar();
-//    }
+    public SimpleCar getCar(long id) {
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
 
-    public SimpleCar getCar(long id) throws DBException {
-        Car car = new CarDao(sessionFactory.openSession()).getCar(id);
+        Car car = new CarDao(sess).getCar(id);
+
+        tx.commit();
+        sess.close();
         return new SimpleCar(car);
     }
 
     public List<SimpleCar> getAllCars() {
-        return new CarDao(sessionFactory.openSession()).getAllCar()
-                .stream()
-                .filter(e -> !e.isSold())
-                .map(SimpleCar::new)
-                .collect(Collectors.toList());
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        List<SimpleCar> simpleCarList =
+                new CarDao(sess).getAllCar()
+                        .stream()
+                        .filter(e -> !e.isSold())
+                        .map(SimpleCar::new)
+                        .collect(Collectors.toList());
+        tx.commit();
+        sess.close();
+        return simpleCarList;
     }
 
     public Long addCar(String brand, String model, String licensePlate, Long price) {
         if (isBrandFull(brand)) {
             return null;
         }
-        return new CarDao(sessionFactory.openSession())
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        Long id = new CarDao(sess)
                 .addCar(brand, model, licensePlate, price);
+
+        tx.commit();
+        sess.close();
+        return id;
     }
 
     public void sellCar(Long id) {
-        new CarDao(sessionFactory.openSession()).setSold(id);
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        new CarDao(sess).setSold(id);
+
+        tx.commit();
+        sess.close();
+    }
+
+    public Long getCarId(String brand, String model, String licensePlate) {
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        Long id = new CarDao(sess)
+                .getCarId(brand, model, licensePlate, false);
+
+        tx.commit();
+        sess.close();
+        return id;
     }
 
     private boolean isBrandFull(String brand) {
@@ -63,15 +98,6 @@ public class CarService {
     private int ofBrandCount(String brand) {
         return new CarDao(sessionFactory.openSession()).ofBrandCount(brand);
     }
-
-    public Long getCarId(String brand, String model, String licensePlate) {
-        return new CarDao(sessionFactory.openSession()).getCarId(brand, model, licensePlate, false);
-    }
-
-    public int removeSoldCars(){
-        return new CarDao(sessionFactory.openSession()).removeSoldCars();
-    }
-
 
     public boolean sellCar(String brand, String model, String licensePlate) {
         Long id = getCarId(brand, model, licensePlate);
