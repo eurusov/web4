@@ -14,48 +14,40 @@ public class SimpleReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private Long earnings;
 
-    @Column
+    @Column(nullable = false)
     private Long soldCars;
 
-    public SimpleReport() {
+    /* needed by Hibernate */
+    SimpleReport() {
     }
 
-    public SimpleReport(final Long earnings, final Long soldCars) {
+    SimpleReport(final Long earnings, final Long soldCars) {
         this.earnings = earnings;
         this.soldCars = soldCars;
     }
 
+    /**
+     * Copying constructor. Intended for create SimpleReport from DailyReport, for transfer to GSON.
+     */
     public SimpleReport(final SimpleReport report) {
         id = report.id;
         earnings = report.earnings;
         soldCars = report.soldCars;
     }
 
-    public Long getId() {
+    Long getId() {
         return id;
     }
 
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public Long getEarnings() {
+    Long getEarnings() {
         return earnings;
     }
 
-    public void setEarnings(final Long earnings) {
-        this.earnings = earnings;
-    }
-
-    public Long getSoldCars() {
+    Long getSoldCars() {
         return soldCars;
-    }
-
-    public void setSoldCars(final Long soldCars) {
-        this.soldCars = soldCars;
     }
 
     @Override

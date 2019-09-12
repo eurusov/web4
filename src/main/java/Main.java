@@ -3,6 +3,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import servlet.*;
 import util.DBHelper;
+import util.Test;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +13,9 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Logger.getLogger("org.hibernate").setLevel(Level.WARNING);
         DBHelper.printConnectInfo();
+
+        Test.dbTest();
+        DBHelper.deleteAll();
 
         /* Creating Servlets*/
         CustomerServlet customerServlet = new CustomerServlet();

@@ -43,14 +43,14 @@ public class CarService {
         Session sess = sessionFactory.openSession();
         Transaction tx = sess.beginTransaction();
 
-        List<SimpleCar> simpleCarList =
-                new CarDao(sess).getListOf("", "", "", null, false)
-                        .stream()
-                        .map(SimpleCar::new)
-                        .collect(Collectors.toList());
+        List<Car> simpleCarList =
+                new CarDao(sess).getListOf("", "", "", null, false);
+
         tx.commit();
         sess.close();
-        return simpleCarList;
+        return simpleCarList.stream()
+                .map(SimpleCar::new)
+                .collect(Collectors.toList());
     }
 
     public Long addCar(String brand, String model, String licensePlate, Long price) {

@@ -7,7 +7,7 @@ import model.SimpleReport;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import util.DBException;
+import model.VirtualDate;
 import util.DBHelper;
 
 import java.util.List;
@@ -30,26 +30,56 @@ public class DailyReportService {
         return dailyReportService;
     }
 
+    public SimpleReport getDailyReport(long id) {
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        DailyReport dailyReport = new DailyReportDao(sess).getDailyReport(id);
+
+        tx.commit();
+        sess.close();
+        return new SimpleReport(dailyReport);
+    }
+
     public List<SimpleReport> getAllDailyReports() {
-        return new DailyReportDao(sessionFactory.openSession()).getAllDailyReport()
-                .stream()
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        List<DailyReport> dailyReportList = new DailyReportDao(sess).getAllDailyReport();
+
+        tx.commit();
+        sess.close();
+
+        return dailyReportList.stream()
                 .map(SimpleReport::new)
                 .collect(Collectors.toList());
     }
 
-    public SimpleReport getDailyReport(long id) throws DBException {
-        DailyReport dailyReport = new DailyReportDao(sessionFactory.openSession()).getDailyReport(id);
-        return new SimpleReport(dailyReport);
-    }
-
     public SimpleReport getLastReport() {
-        DailyReport dailyReport = new DailyReportDao(sessionFactory.openSession()).getLastDailyReport();
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        DailyReport dailyReport = new DailyReportDao(sess).getDailyReportForDate(VirtualDate.getYesterdayDate());
+
+        tx.commit();
+        sess.close();
+
+        if (dailyReport == null) {
+            dailyReport = new DailyReport(0L, 0L);
+        }
         return new SimpleReport(dailyReport);
     }
 
     public Long addDailyReport(Long earnings, Long soldCars) {
-        return new DailyReportDao(sessionFactory.openSession())
-                .addDailyReport(earnings, soldCars);
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        Long id = new DailyReportDao(sess).saveDailyReport(new DailyReport(earnings, soldCars));
+
+        tx.commit();
+        sess.close();
+
+        return id;
     }
 
     public void createDailyReport() {

@@ -2,11 +2,12 @@ package util;
 
 import model.SimpleCar;
 import model.SimpleReport;
+import model.VirtualDate;
 import service.CarService;
 import service.DailyReportService;
 
 public class Test {
-    public void test() throws DBException {
+    public static void dbTest() throws DBException {
         CarService carService = CarService.getInstance();
         DailyReportService dailyReportService = DailyReportService.getInstance();
 
@@ -38,7 +39,7 @@ public class Test {
         SimpleReport simpleReport = dailyReportService.getDailyReport(repId);
         System.out.println("getDailyReport by this id returns: " + simpleReport);
 
-        DBDate.nextDay();
+        VirtualDate.nextDayHasCome();
         System.out.println("\nDate was changed.\n");
 
         repId = dailyReportService.addDailyReport(3000L, 10L);
@@ -50,7 +51,5 @@ public class Test {
         System.out.println("\nAll reports list:\n" + dailyReportService.getAllDailyReports());
         System.out.println("\nLast report:\n" + dailyReportService.getLastReport());
         System.out.println();
-
-        DBHelper.deleteAll();
     }
 }

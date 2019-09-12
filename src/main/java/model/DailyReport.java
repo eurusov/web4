@@ -1,7 +1,5 @@
 package model;
 
-import util.DBDate;
-
 import javax.persistence.*;
 
 @Entity
@@ -9,19 +7,17 @@ import javax.persistence.*;
 public class DailyReport extends SimpleReport {
 
     @Embedded
-    private DBDate date;
+    @AttributeOverride(name = "value", column = @Column(name = "date", nullable = false, unique = true))
+    private VirtualDate date;
 
+    /* needed by Hibernate */
     public DailyReport() {
         super();
     }
 
     public DailyReport(final Long earnings, final Long soldCars) {
         super(earnings, soldCars);
-        this.date = new DBDate();
-    }
-
-    public DBDate getDate() {
-        return date;
+        this.date = VirtualDate.getTodayDate();
     }
 
     @Override
