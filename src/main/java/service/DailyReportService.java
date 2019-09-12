@@ -70,7 +70,7 @@ public class DailyReportService {
         return new SimpleReport(dailyReport);
     }
 
-    public Long addDailyReport(Long earnings, Long soldCars) {
+    public Long saveDailyReport(Long earnings, Long soldCars) {
         Session sess = sessionFactory.openSession();
         Transaction tx = sess.beginTransaction();
 
@@ -82,19 +82,18 @@ public class DailyReportService {
         return id;
     }
 
-    public void createDailyReport() {
+    public void generateDailyReport() {
         Session sess = sessionFactory.openSession();
         CarDao carDao = new CarDao(sess);
         Transaction tx = sess.beginTransaction();
 
         Long soldAmount = carDao.soldAmount();
-//        Long soldCount = carDao.soldCount();
         long soldCount = new CarDao(sess).removeSoldCars();
 
         tx.commit();
         sess.close();
 
         soldAmount = soldAmount == null ? 0 : soldAmount;
-        addDailyReport(soldAmount, soldCount);
+        saveDailyReport(soldAmount, soldCount);
     }
 }

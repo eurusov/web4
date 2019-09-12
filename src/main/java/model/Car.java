@@ -9,6 +9,7 @@ public class Car extends SimpleCar {
     @Column
     private boolean sold;
 
+    /* needed by Hibernate */
     public Car() {
         super();
     }
@@ -16,10 +17,6 @@ public class Car extends SimpleCar {
     public Car(String brand, String model, String licensePlate, Long price) {
         super(brand, model, licensePlate, price);
         sold = false;
-    }
-
-    public boolean isSold() {
-        return sold;
     }
 
     public void setSold() {

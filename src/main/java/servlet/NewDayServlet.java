@@ -11,8 +11,7 @@ public class NewDayServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        DailyReportService.getInstance().createDailyReport();
-//        CarService.getInstance().removeSoldCars();
+        DailyReportService.getInstance().generateDailyReport();
         VirtualDate.nextDayHasCome();
     }
 }

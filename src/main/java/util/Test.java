@@ -7,7 +7,7 @@ import service.CarService;
 import service.DailyReportService;
 
 public class Test {
-    public static void dbTest() throws DBException {
+    public static void dbTest() {
         CarService carService = CarService.getInstance();
         DailyReportService dailyReportService = DailyReportService.getInstance();
 
@@ -18,7 +18,7 @@ public class Test {
                 45000L
         );
         System.out.println("Car was added with id = " + carId);
-//        carService.sellCar(carId); // mark this car as sold
+//        carService.sellCar(carId);
         SimpleCar car = carService.getCar(carId);
         System.out.println(car);
 
@@ -34,7 +34,7 @@ public class Test {
         System.out.println();
 
 
-        Long repId = dailyReportService.addDailyReport(123000L, 16L);
+        Long repId = dailyReportService.saveDailyReport(123000L, 16L);
         System.out.println("DailyReport was added with id = " + repId);
         SimpleReport simpleReport = dailyReportService.getDailyReport(repId);
         System.out.println("getDailyReport by this id returns: " + simpleReport);
@@ -42,7 +42,7 @@ public class Test {
         VirtualDate.nextDayHasCome();
         System.out.println("\nDate was changed.\n");
 
-        repId = dailyReportService.addDailyReport(3000L, 10L);
+        repId = dailyReportService.saveDailyReport(3000L, 10L);
         System.out.println("DailyReport was added with id = " + repId);
         simpleReport = dailyReportService.getDailyReport(repId);
         System.out.println("getDailyReport by this id returns: " + simpleReport);

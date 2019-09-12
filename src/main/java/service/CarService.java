@@ -60,34 +60,8 @@ public class CarService {
         CarDao carDao = new CarDao(sess);
         Long id = null;
         if (carDao.countOf(brand, "", "", null, false) < 10) {
-            id = carDao
-                    .addCar(new Car(brand, model, licensePlate, price));
+            id = carDao.addCar(new Car(brand, model, licensePlate, price));
         }
-
-        tx.commit();
-        sess.close();
-        return id;
-    }
-
-    public void sellCar(Long id) {
-        Session sess = sessionFactory.openSession();
-        Transaction tx = sess.beginTransaction();
-
-        Car car = new CarDao(sess).getCar(id);
-        if (car != null) {
-            car.setSold();
-        }
-
-        tx.commit();
-        sess.close();
-    }
-
-    public Long getCarId(String brand, String model, String licensePlate) {
-        Session sess = sessionFactory.openSession();
-        Transaction tx = sess.beginTransaction();
-
-        Long id = new CarDao(sess)
-                .getCarId(brand, model, licensePlate, false);
 
         tx.commit();
         sess.close();
@@ -101,5 +75,30 @@ public class CarService {
         }
         sellCar(id);
         return true;
+    }
+
+    private void sellCar(Long id) {
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        Car car = new CarDao(sess).getCar(id);
+        if (car != null) {
+            car.setSold();
+        }
+
+        tx.commit();
+        sess.close();
+    }
+
+    private Long getCarId(String brand, String model, String licensePlate) {
+        Session sess = sessionFactory.openSession();
+        Transaction tx = sess.beginTransaction();
+
+        Long id = new CarDao(sess)
+                .getCarId(brand, model, licensePlate, false);
+
+        tx.commit();
+        sess.close();
+        return id;
     }
 }

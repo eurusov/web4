@@ -54,8 +54,7 @@ public class CarDao {
         return (res.size() == 0) ? null : (Long) res.get(0);
     }
 
-    // TODO: нужен ли здесь throws?
-    public Long addCar(Car car) throws HibernateException {
+    public Long addCar(Car car) {
         return (Long) session.save(car);
     }
 

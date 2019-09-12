@@ -1,7 +1,6 @@
 package servlet;
 
 import service.CarService;
-import util.DBException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,16 +14,12 @@ public class ProducerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Map<String, String[]> params = req.getParameterMap();
         CarService carService = CarService.getInstance();
-        Long acceptedId = null;
-        try {
-            acceptedId = carService.addCar(
-                    params.get("brand")[0],
-                    params.get("model")[0],
-                    params.get("licensePlate")[0],
-                    Long.valueOf(params.get("price")[0])
-            );
-        } catch (Exception ignored) {
-        }
+        Long acceptedId = carService.addCar(
+                params.get("brand")[0],
+                params.get("model")[0],
+                params.get("licensePlate")[0],
+                Long.valueOf(params.get("price")[0])
+        );
         resp.setStatus(acceptedId != null ? HttpServletResponse.SC_OK : HttpServletResponse.SC_FORBIDDEN);
         resp.getWriter().println("");
         resp.flushBuffer();
