@@ -44,9 +44,8 @@ public class CarService {
         Transaction tx = sess.beginTransaction();
 
         List<SimpleCar> simpleCarList =
-                new CarDao(sess).getAllCar()
+                new CarDao(sess).getListOf("", "", "", null, false)
                         .stream()
-                        .filter(e -> !e.isSold())
                         .map(SimpleCar::new)
                         .collect(Collectors.toList());
         tx.commit();
@@ -55,14 +54,15 @@ public class CarService {
     }
 
     public Long addCar(String brand, String model, String licensePlate, Long price) {
-        if (isBrandFull(brand)) {
-            return null;
-        }
         Session sess = sessionFactory.openSession();
         Transaction tx = sess.beginTransaction();
 
-        Long id = new CarDao(sess)
-                .addCar(brand, model, licensePlate, price);
+        CarDao carDao = new CarDao(sess);
+        Long id = null;
+        if (carDao.countOf(brand, "", "", null, false) < 10) {
+            id = carDao
+                    .addCar(new Car(brand, model, licensePlate, price));
+        }
 
         tx.commit();
         sess.close();
@@ -73,7 +73,10 @@ public class CarService {
         Session sess = sessionFactory.openSession();
         Transaction tx = sess.beginTransaction();
 
-        new CarDao(sess).setSold(id);
+        Car car = new CarDao(sess).getCar(id);
+        if (car != null) {
+            car.setSold();
+        }
 
         tx.commit();
         sess.close();
@@ -89,14 +92,6 @@ public class CarService {
         tx.commit();
         sess.close();
         return id;
-    }
-
-    private boolean isBrandFull(String brand) {
-        return ofBrandCount(brand) >= 10;
-    }
-
-    private int ofBrandCount(String brand) {
-        return new CarDao(sessionFactory.openSession()).ofBrandCount(brand);
     }
 
     public boolean sellCar(String brand, String model, String licensePlate) {

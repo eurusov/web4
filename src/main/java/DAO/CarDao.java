@@ -1,9 +1,11 @@
 package DAO;
 
-import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import model.Car;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -23,44 +25,9 @@ public class CarDao {
      * @param id Car id
      * @return a persistent instance or null
      */
-    public @Nullable
-    Car getCar(long id) {
+    @Nullable
+    public Car getCar(long id) {
         return (Car) session.get(Car.class, id);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<Car> getAllCar() {
-        // TODO: Сделать параметризацию sold.
-        return session.createQuery("FROM Car WHERE sold=false").list();
-    }
-
-    // TODO:  Переделать чтобы принимал Car вместо набора значений полей.
-    public Long addCar(String brand, String model, String licensePlate, Long price) throws HibernateException {
-        return (Long) session.save(new Car(brand, model, licensePlate, price));
-    }
-
-    public void setSold(long id) throws HibernateException {
-        Car car = (Car) session.get(Car.class, id);
-        car.setSold();
-        session.update(car); // TODO:  Проверить, возможно update не нужен, так как car должен быть persistent.
-    }
-
-    /**
-     * @return the number of cars of this brand in the car dealership that are not sold
-     */
-    public int ofBrandCount(String brand) {
-        // TODO:  Проверить по логам и в дебаге, где здесь реально начинаются транзакции.
-        Transaction tx = session.beginTransaction();
-
-        Criteria criteria = session.createCriteria(Car.class);
-        criteria.add(Restrictions.eq("brand", brand));
-        criteria.add(Restrictions.eq("sold", false));
-        criteria.setProjection(Projections.rowCount());
-        Object res = criteria.uniqueResult();
-
-        tx.commit();
-        session.close();
-        return res == null ? 0 : ((Long) res).intValue();
     }
 
     /**
@@ -70,12 +37,12 @@ public class CarDao {
      */
     @Nullable
     public Long getCarId(String brand, String model, String licensePlate, boolean sold) {
-        String sql = "SELECT id FROM Car"
+        String hql = "SELECT id FROM Car"
                 + " WHERE brand=:c_brand"
                 + " AND model=:c_model"
                 + " AND licensePlate=:c_licensePlate"
                 + " AND sold=:c_sold";
-        Query query = session.createQuery(sql);
+        Query query = session.createQuery(hql);
         query.setString("c_brand", brand);
         query.setString("c_model", model);
         query.setString("c_licensePlate", licensePlate);
@@ -87,20 +54,41 @@ public class CarDao {
         return (res.size() == 0) ? null : (Long) res.get(0);
     }
 
-    /**
-     * @return Number of cars sold.
-     */
-//    @Nullable
-//    public Long soldCount() {
-//        String countHql = "SELECT COUNT(*) FROM Car WHERE sold=true";
-//        return (Long) session.createQuery(countHql).uniqueResult();
-//    }
-//
+    // TODO: нужен ли здесь throws?
+    public Long addCar(Car car) throws HibernateException {
+        return (Long) session.save(car);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public List<Car> getListOf(
+            String brand,
+            String model,
+            String licensePlate,
+            Long price,
+            Boolean sold
+    ) {
+        Criteria criteria = getCriteria(brand, model, licensePlate, price, sold);
+        return criteria.list();
+    }
+
+    @Nullable
+    public Long countOf(
+            String brand,
+            String model,
+            String licensePlate,
+            Long price,
+            Boolean sold
+    ) {
+        Criteria criteria = getCriteria(brand, model, licensePlate, price, sold);
+        criteria.setProjection(Projections.rowCount());
+        return (Long) criteria.uniqueResult();
+    }
 
     /**
      * @return Total sales of cars.
      */
-    @NotNull
+    @Nullable
     public Long soldAmount() {
         String sumHql = "SELECT SUM(price) FROM Car WHERE sold=true";
         return (Long) session.createQuery(sumHql).uniqueResult();
@@ -112,7 +100,33 @@ public class CarDao {
      * @return The number of deleted entities.
      */
     public int removeSoldCars() {
-        String sumHql = "DELETE FROM Car WHERE sold=true";
-        return session.createQuery(sumHql).executeUpdate();
+        String delHql = "DELETE FROM Car WHERE sold=true";
+        return session.createQuery(delHql).executeUpdate();
+    }
+
+    private Criteria getCriteria(
+            String brand,
+            String model,
+            String licensePlate,
+            Long price,
+            Boolean sold
+    ) {
+        Criteria criteria = session.createCriteria(Car.class);
+        if (!"".equals(brand)) {
+            criteria.add(Restrictions.eq("brand", brand));
+        }
+        if (!"".equals(model)) {
+            criteria.add(Restrictions.eq("model", model));
+        }
+        if (!"".equals(licensePlate)) {
+            criteria.add(Restrictions.eq("licensePlate", licensePlate));
+        }
+        if (price != null) {
+            criteria.add(Restrictions.eq("price", price));
+        }
+        if (sold != null) {
+            criteria.add(Restrictions.eq("sold", sold));
+        }
+        return criteria;
     }
 }
