@@ -14,7 +14,7 @@ public class Main {
         Logger.getLogger("org.hibernate").setLevel(Level.WARNING);
         DBHelper.printConnectInfo();
 
-        Test.dbTest();
+//        Test.dbTest();
         DBHelper.deleteAll();
 
         /* Creating Servlets*/
